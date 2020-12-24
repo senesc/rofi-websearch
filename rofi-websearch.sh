@@ -32,6 +32,9 @@ then
 	echo -en "f - firefox\t"
 	echo -en "[x]g - google\t"
 	echo -en "[x]d - duckduckgo\t"
+	echo -en "[x]az - amazon\t"
+	echo -en "[x]n - netflix\t"
+	echo -en "[x]gd - google drive\t"
 	echo -en "[x]y - youtube\t"
 	echo -en "[x]gh - github\t"
 	echo -en "[x]gn - genius\t"
@@ -39,7 +42,8 @@ then
 elif [ $ROFI_RETV -eq 2 ]
 then
 	cmd=$BROWSER
-	case x"$(echo $@ | cut -c 1)" in
+	firstWord=$(echo "$@" | cut -f1 -d ' ')
+	case x"$(echo $firstWord | cut -c1)" in
 		x"c") cmd="chromium ";;
 		x"C") cmd="chromium --new-window ";;
 		x"v") cmd="vivaldi-stable ";;
@@ -47,20 +51,23 @@ then
 		x"f") cmd="firefox ";;
 		x"F") cmd="firefox --new-window ";;
 	esac
-	c2=$(echo $@ | cut -c "2 3")
-	secondWord=$(echo $@ | sed 's/^..[ ]*//')
-	if [[ x"$c2" == x" " ]]
+	c2=$(echo $firstWord | cut -c2-)
+	otherWords=$(echo $@ | cut -f2- -d ' ')
+	if [[ x"$c2" == x"" ]]
 	then
-		cmd+=$secondWord
+		cmd+=$otherWords
 		runBackground $cmd
 	else
-		query=$(rawurlencode "$secondWord")
+		query=$(rawurlencode "$otherWords")
 		case x"$c2" in
 			x"g ") cmd+="https://google.com/search?q=$query"; runBackground $cmd;;
 			x"d ") cmd+="https://duckduckgo.com/?q=$query"; runBackground $cmd;;
+			x"az") cmd+="https://amazon.it/s?k=$query"; runBackground $cmd;;
 			x"y ") cmd+="https://youtube.com/results?search_qyuery=$query"; runBackground $cmd;;
 			x"gh") cmd+="https://github.com/search?q=$query"; runBackground $cmd;;
 			x"gn") cmd+="https://genius.com/search?q=$query"; runBackground $cmd;;
+			x"gd") cmd+="https://drive.google.com/drive/search?q=$query"; runBackground $cmd;;
+			x"n") cmd+="https://www.netflix.com/search?q=$query"; runBackground $cmd;;
 		esac
 	fi
 fi
